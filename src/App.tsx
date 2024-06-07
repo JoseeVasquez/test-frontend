@@ -1,9 +1,8 @@
 import { useState } from "react";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import "./App.css";
 import Form from "./Form";
-import Users from "./Users";
 import Product from "./Product";
+import "./style/main.css"
 
 const App = () => {
 	const [jwtToken, setJwtToken] = useState<string>();
@@ -53,7 +52,6 @@ const App = () => {
 		<>
 			<Form handleJwt={handleJwt} postData={postData} />
 			{isAuthenticated ? <Product fetchData={fetchData} /> : <></>}
-			<Users fetchData={fetchData} />
 		</>
 	);
 };

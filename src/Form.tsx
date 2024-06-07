@@ -107,7 +107,7 @@ const LoginForm = ({
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
+		<form className="authForm" onSubmit={handleSubmit}>
 			<label htmlFor="username">Username:</label>
 			<input
 				type="text"
@@ -169,7 +169,7 @@ const RegisterForm = ({ postData, setIsLogin }: RegisterProps) => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
+		<form className="authForm" onSubmit={handleSubmit}>
 			<label>
 				DNI/CIF:
 				<input
