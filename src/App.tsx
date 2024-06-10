@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import Form from "./Form";
 import Product from "./Product";
+import Navbar from "./Navbar";
 import "./style/main.css"
 
 const App = () => {
@@ -50,8 +51,10 @@ const App = () => {
 
 	return (
 		<>
-			<Form handleJwt={handleJwt} postData={postData} />
-			{isAuthenticated ? <Product fetchData={fetchData} /> : <></>}
+            <Navbar handleJwt={handleJwt} postData={postData}/>
+            {isAuthenticated 
+                ? <Product fetchData={fetchData} /> 
+                : <Form handleJwt={handleJwt} postData={postData} />}
 		</>
 	);
 };

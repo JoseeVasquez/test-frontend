@@ -1,5 +1,7 @@
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useState } from "react";
+import './style/main.css'
+import './style/form.css'
 
 interface LoginResponse {
 	user: string;
@@ -21,7 +23,6 @@ interface LoginProps {
 		config?: AxiosRequestConfig
 	) => Promise<AxiosResponse<LoginResponse>>;
 	handleJwt: (jwt: string, auth: boolean) => void;
-	setIsAuth: (auth: boolean) => void;
 	setIsLogin: (state: boolean) => void;
 }
 
@@ -46,37 +47,19 @@ interface RegisterProps {
 
 const Form = ({ handleJwt, postData }: FormProps) => {
 	const [isLogin, setIsLogin] = useState(true);
-	const [isAuth, setIsAuth] = useState(false);
 
-	const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
-		e.preventDefault();
-		try {
-			const response = postData("logout");
-			handleJwt("", false);
-			setIsAuth(false);
-			console.log((await response).data);
-		} catch (error) {
-			console.error(error);
-		}
-	};
 	return (
 		<>
-			{!isAuth ? (
-				isLogin ? (
+			{ isLogin ? (
 					<LoginForm
 						postData={postData}
 						handleJwt={handleJwt}
-						setIsAuth={setIsAuth}
 						setIsLogin={setIsLogin}
 					/>
 				) : (
 					<RegisterForm postData={postData} setIsLogin={setIsLogin} />
 				)
-			) : (
-				<button type="button" onClick={handleLogout}>
-					Logout
-				</button>
-			)}
+            }
 		</>
 	);
 };
@@ -84,7 +67,6 @@ const Form = ({ handleJwt, postData }: FormProps) => {
 const LoginForm = ({
 	postData,
 	handleJwt,
-	setIsAuth,
 	setIsLogin,
 }: LoginProps) => {
 	const [username, setUsername] = useState<string>("");
@@ -100,7 +82,6 @@ const LoginForm = ({
 				},
 			});
 			handleJwt(response.data.jwt, true);
-			setIsAuth(true);
 		} catch (error) {
 			console.log(error);
 		}
@@ -122,12 +103,10 @@ const LoginForm = ({
 				onChange={(e) => setPassword(e.target.value)}
 				required
 			/>
-			<button type="submit">Submit</button>
-			<br />
-			<br />
-			<span>
+			<button className="button" type="submit">Submit</button>
+			<span className="changeForm">
 				No account?:{" "}
-				<button type="button" onClick={() => setIsLogin(false)}>
+				<button className="button" type="button" onClick={() => setIsLogin(false)}>
 					Register!!
 				</button>
 			</span>
@@ -169,105 +148,102 @@ const RegisterForm = ({ postData, setIsLogin }: RegisterProps) => {
 	};
 
 	return (
-		<form className="authForm" onSubmit={handleSubmit}>
-			<label>
-				DNI/CIF:
-				<input
-					type="text"
-					name="dniCif"
-					value={formData.dniCif}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Name:
-				<input
-					type="text"
-					name="name"
-					value={formData.name}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Email:
-				<input
-					type="email"
-					name="email"
-					value={formData.email}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Address:
-				<input
-					type="text"
-					name="address"
-					value={formData.address}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Phone:
-				<input
-					type="tel"
-					name="phone"
-					value={formData.phone}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Password:
-				<input
-					type="password"
-					name="password"
-					value={formData.password}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Currency:
-				<input
-					type="text"
-					name="currency"
-					value={formData.currency}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<label>
-				Language:
-				<input
-					type="text"
-					name="language"
-					value={formData.language}
-					onChange={handleChange}
-				/>
-			</label>
-			<br />
-			<br />
-			<button type="submit">Register</button>
-			<br />
-			<br />
-			<span>
-				Already have an account?
-				<button type="button" onClick={() => setIsLogin(true)}>
-					Login!!
-				</button>
-			</span>
-		</form>
+        <form className="authForm" onSubmit={handleSubmit}>
+            <div className="formGroup">
+                <label htmlFor="dniCif">DNI/CIF:</label>
+                <input
+                    type="text"
+                    id="dniCif"
+                    name="dniCif"
+                    value={formData.dniCif}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="name">Name:</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="email">Email:</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="address">Address:</label>
+                <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="phone">Phone:</label>
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="password">Password:</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="currency">Currency:</label>
+                <input
+                    type="text"
+                    id="currency"
+                    name="currency"
+                    value={formData.currency}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="formGroup">
+                <label htmlFor="language">Language:</label>
+                <input
+                    type="text"
+                    id="language"
+                    name="language"
+                    value={formData.language}
+                    onChange={handleChange}
+                />
+            </div>
+            <button className="button" type="submit">Register</button>
+            <span className="changeForm">
+                Already have an account?
+                <button className="button changeBtn" type="button" onClick={() => setIsLogin(true)}>
+                    Login!!
+                </button>
+            </span>
+        </form>
 	);
 };
 

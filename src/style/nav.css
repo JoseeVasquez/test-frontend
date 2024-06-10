@@ -1,0 +1,113 @@
+.mainNav {
+    background-color: #b0b0b0;
+    width: 5rem;
+    margin-right: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transition: ease-in-out 200ms, opacity 200ms ease-in-out;
+    opacity: 0.75;
+    z-index: 999;
+}
+
+.mainNav.open {
+    background-color: #a1a1a1;
+    width: 30vw;
+    opacity: 0.95;
+}
+
+.hamburger {
+    position: absolute;
+    top: 2rem;
+    left: .5rem;
+    background: none;
+    border: none;
+    z-index: 9999;
+
+    cursor: pointer;
+}
+
+.hamburger div {
+    /* sizing */
+    height: .5rem;
+    width: 3rem;
+    margin-block: .25rem;
+    
+    /* border */
+    border-radius: 4px;
+
+    /* color */
+    background-color: #B464FF;
+
+    /* animation */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Transformations for the 'open' state */
+.top.open {
+    transform: rotate(45deg) translate(0.5rem, 0.5rem);
+}
+
+.middle.open {
+    opacity: 0;
+}
+
+.bottom.open {
+    transform: rotate(-45deg) translate(0.5rem, -0.5rem);
+}
+
+.navList {
+    display: none;
+}
+
+.navList.open {
+    display: block;
+    list-style: none;
+
+    position: absolute;
+    top: 15%;
+    left: 10%;
+
+    transition: ease-in-out 200ms;
+
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.navItem {
+    font-size: 1.5rem;
+    display: inline-block;
+    padding-bottom: 2px;
+    background-image: linear-gradient(#ccc 0 0, #000 0 100%);
+    background-position: 0 100%;
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    transition: background-size 0.3s, background-position 0s 0.3s;
+}
+
+.navItem:hover,
+.navItem:hover > *,
+.navItem:target,
+.navItem:target > *{
+    color: #757575;
+    cursor: pointer;
+    background-position: 90% 100%;
+    background-size: 100% 2px;
+}
+
+.logoutButton {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0px;
+    margin: 0px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+

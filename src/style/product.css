@@ -1,0 +1,46 @@
+:root {
+
+}
+
+.productContainer { 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    margin-inline: 10rem;
+    margin-top: 5rem;
+}
+
+.product {
+    background-color: #f8f8f8;
+    border: 4px black inset;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.product h2 {
+    font-size: 1.25rem;
+    margin: 0.5rem 0;
+}
+
+.product p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.price {
+    font-size: 1.25rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.add {
+    background: none;
+    padding-block: .5rem;
+    border: none;
+}
+
+.add:hover {
+    background-color: #d9d9d9;
+}
