@@ -10,14 +10,11 @@ body {
     
     /* sizing and positioning*/
     height: 100dvh;
-    width: 100dvw;
 }
 
 #root {
     /* sizing and positioning*/
     height: 100dvh;
-    width: 100dvw;
-
 }
 
 .button {

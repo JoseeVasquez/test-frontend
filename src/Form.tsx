@@ -29,7 +29,7 @@ interface LoginProps {
 interface RegisterData {
 	dniCif: string;
 	name: string;
-	email: string;
+    email: string;
 	address: string;
 	phone: string;
 	password: string;
