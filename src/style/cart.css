@@ -1,7 +1,157 @@
+.cartPlaceHolder {
+	display: none;
+
+	background-color: #f8f8f8;
+	font-size: 1.5rem;
+	width: max-content;
+	padding: 0.75rem 1rem;
+	margin-inline: auto;
+
+	border-radius: 6px;
+}
+
+.cartPlaceHolder.open {
+	display: block;
+}
+
 .cartIcon {
-    margin-left: auto;
+	margin-block: 1.5rem;
+	margin-inline: auto 1.25rem;
+	cursor: pointer;
+	scale: 1.6;
 }
 
 .cart {
-    text-align: right;
+	position: fixed;
+	width: 5rem;
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+
+	display: flex;
+	flex-direction: column;
+
+	background-color: #b0b0b0;
+
+	transition:
+		ease-in-out 200ms,
+		opacity 200ms ease-in-out;
+	opacity: 0.75;
+	z-index: 999;
+}
+
+.cartItems {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	overflow-y: scroll;
+	overflow-x: hidden;
+
+	height: 80%;
+}
+
+.cart.open {
+	width: 30vw;
+	opacity: 0.95;
+}
+.cartItem {
+	margin-inline: 2rem;
+	background-color: #f8f8f8;
+	border: 4px black inset;
+	border-radius: 8px;
+
+	box-shadow: 9px 11px 20px 0px;
+	padding: 0.75rem;
+
+	opacity: 0;
+	transition: opacity 250ms ease-in-out;
+	height: 8rem;
+
+	position: relative;
+}
+
+.cartItem h2 {
+	font-weight: normal;
+	font-size: 1.75rem;
+	margin-block: 0.75rem;
+}
+
+.cartItem p {
+	margin-top: 3rem;
+	font-size: 1.25rem;
+}
+
+.cartItem.open {
+	opacity: 1;
+}
+
+.amountContainer {
+	position: relative;
+	bottom: 40%;
+	left: 75%;
+}
+
+.amountContainer span {
+	font-size: 1.5rem;
+	margin-inline: 0.5rem;
+}
+
+.updateStock {
+	background: none;
+	border-radius: 6px;
+	padding: 0.25rem 0.75rem;
+	font-size: 1.5rem;
+	cursor: pointer;
+}
+
+.clearCart {
+	position: absolute;
+	bottom: 3rem;
+	right: 3rem;
+	display: none;
+
+	background: none;
+	font-size: 1.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: 8px;
+
+	cursor: pointer;
+
+	transition: ease-in-out 150ms;
+}
+
+.clearCart:hover {
+	scale: 1.1;
+	background-color: gray;
+	border: 2px solid;
+}
+
+.clearCart.open {
+	display: block;
+}
+
+.total {
+	position: absolute;
+	bottom: 3rem;
+	left: 3rem;
+	display: none;
+
+	background-color: #f8f8f8;
+	font-size: 1.5rem;
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+
+	transition: ease-in-out 150ms;
+}
+
+.total.open {
+	display: block;
+}
+
+.deleteBtn {
+	position: absolute;
+	top: 20%;
+	right: 10%;
+	cursor: pointer;
+	font-size: 1.5rem;
 }
