@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./style/cart.css";
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { useCart } from "./CartContext";
 import { useOutsideClick } from "./hooks/useOutsideClick";
 import { ProductResponse } from "./Product";
@@ -164,7 +164,13 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 			console.log(response.data);
 			setCart(response.data);
 		} catch (error) {
-			console.error(error);
+			const e: AxiosError = error as AxiosError;
+			if (e.response && e.response.status === 404) {
+				// Handle the case where the cart is empty
+				setCart({ numCart, userId, allCarts: [], totalPrices: 0 });
+			} else {
+				console.error(error);
+			}
 		}
 	};
 
