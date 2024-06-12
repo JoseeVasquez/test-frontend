@@ -16,9 +16,9 @@
 
 .cartIcon {
 	margin-block: 1.5rem;
-	margin-inline: auto 1.25rem;
+	margin-inline: auto 1rem;
 	cursor: pointer;
-	scale: 1.6;
+	height: 3rem;
 }
 
 .cart {
@@ -47,7 +47,7 @@
 	overflow-y: scroll;
 	overflow-x: hidden;
 
-	height: 80%;
+	height: 70%;
 }
 
 .cart.open {
@@ -77,7 +77,7 @@
 }
 
 .cartItem p {
-	margin-top: 3rem;
+	margin-block: 0.5rem;
 	font-size: 1.25rem;
 }
 
@@ -132,7 +132,7 @@
 
 .total {
 	position: absolute;
-	bottom: 3rem;
+	bottom: 8rem;
 	left: 3rem;
 	display: none;
 
@@ -150,8 +150,25 @@
 
 .deleteBtn {
 	position: absolute;
-	top: 20%;
-	right: 10%;
+	top: 10%;
+	right: 5%;
 	cursor: pointer;
+	height: 2rem;
+}
+
+.checkout {
+	position: absolute;
+	bottom: 3rem;
+	left: 3rem;
 	font-size: 1.5rem;
+	width: max-content;
+	padding: 0.75rem 1.25rem;
+	border-radius: 6px;
+	border: none;
+	display: none;
+	transition: ease-in-out 150ms;
+}
+
+.checkout.open {
+	display: block;
 }

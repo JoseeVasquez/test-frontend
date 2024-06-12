@@ -8,6 +8,7 @@ export interface ProductResponse {
 	id: number;
 	name: number;
 	price: number;
+	vat: number;
 }
 
 interface ProductProps {

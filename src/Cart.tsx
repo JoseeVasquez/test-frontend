@@ -17,6 +17,13 @@ export interface CartData {
 	totalPrices: number;
 }
 
+export interface InvoiceData {
+	id: number;
+	userId: number;
+	invoiceDate: Date;
+	totalPrice: number;
+}
+
 interface CartProps {
 	fetchData: <T>(
 		path: string,
@@ -40,20 +47,55 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 	const [total, setTotal] = useState<number>();
 	const numCart = 1;
 
+	const handleCheckout = async () => {
+		try {
+			// create the invoice
+			const invoiceRes = await postData<InvoiceData>(
+				`invoice/${numCart}/user/${userId}`,
+			);
+
+			// retrieve the pdf blob
+			const invoice = invoiceRes.data;
+			const res = await fetchData<Blob>(`invoice/${invoice.id}`, {
+				responseType: "blob",
+			});
+
+			// create blob from that
+			const blob = new Blob([res.data], { type: "application/json" });
+
+			// create link
+			const link = document.createElement("a");
+			link.href = window.URL.createObjectURL(blob);
+			link.download = "invoice.pdf";
+
+			// clicks the link and then removes it
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+
+			window.location.reload();
+
+			console.log(res.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const ref = useOutsideClick(() => {
 		setIsOpen(false);
 	});
 
-	const getProductPrice = (p: number): number => {
-		const product = products.find((product) => product.id === p);
-		return product ? product.price : 0;
-	};
-
 	const calculateTotal = () => {
 		if (cart && products.length) {
 			const totalPrice = cart.allCarts.reduce((sum, item) => {
-				const productPrice = getProductPrice(item.productId);
-				return sum + item.stockSell * productPrice;
+				const product = products.find(
+					(product) => product.id === item.productId,
+				);
+				const vat = product ? product?.vat / 100 : 0;
+				return product
+					? (product.price + product.price * vat) * item.stockSell +
+							sum
+					: 0;
 			}, 0);
 			setTotal(parseFloat(totalPrice.toFixed(2)));
 		}
@@ -205,7 +247,7 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 	return (
 		<div ref={ref} className={`cart ${isOpen ? "open" : ""}`}>
 			<img
-				src="/images/react.svg"
+				src="/images/shopping-cart-01-svgrepo-com.svg"
 				className="cartIcon"
 				onClick={() => setIsOpen(!isOpen)}
 				alt="CartData Icon"
@@ -217,21 +259,29 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 							const product = products.find(
 								(p) => p.id === item.productId,
 							);
+
+							const vatPer = product ? product.vat / 100 : 0;
+							const price = product
+								? product.price + product.price * vatPer
+								: 0;
 							return (
 								<div
 									key={item.productId}
 									className={`cartItem ${isOpen ? "open" : ""}`}
 								>
 									<h2>{product?.name}</h2>
-									<span
+									<img
+										src="/images/delete-svgrepo-com.svg"
 										className="deleteBtn"
 										onClick={() =>
 											deleteProduct(item.productId)
 										}
-									>
-										D
-									</span>
-									<p>Price: {product?.price.toFixed(2)}</p>
+									/>
+									<p>Price: {price}</p>
+									<p>
+										Total price:{" "}
+										{(price * item.stockSell).toFixed(2)}
+									</p>
 									<div className="amountContainer">
 										<button
 											type="button"
@@ -283,6 +333,13 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 					onClick={clearCart}
 				>
 					Clear cart
+				</button>
+				<button
+					type="button"
+					className={`checkout button ${isOpen ? "open" : ""}`}
+					onClick={() => handleCheckout()}
+				>
+					Checkout
 				</button>
 			</div>
 		</div>
