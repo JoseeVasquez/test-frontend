@@ -4,7 +4,7 @@ import "./style/product.css";
 import { useCart } from "./CartContext";
 import { CartItem } from "./Cart";
 
-interface ProductResponse {
+export interface ProductResponse {
 	id: number;
 	name: number;
 	price: number;

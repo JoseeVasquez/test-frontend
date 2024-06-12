@@ -1,16 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import "./style/cart.css";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useCart } from "./CartContext";
 import { useOutsideClick } from "./hooks/useOutsideClick";
+import { ProductResponse } from "./Product";
 
-interface ProductResponse {
-	id: number;
-	name: string;
-	price: number;
-}
-
-interface CartItem {
+export interface CartItem {
 	productId: number;
 	stockSell: number;
 }

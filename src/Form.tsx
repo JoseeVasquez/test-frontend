@@ -1,7 +1,8 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { useState } from "react";
 import "./style/main.css";
 import "./style/form.css";
+import { ErrorResponse } from "./App";
 
 interface LoginResponse {
 	user: string;
@@ -69,6 +70,7 @@ const Form = ({ handleJwt, postData }: FormProps) => {
 const LoginForm = ({ postData, handleJwt, setIsLogin }: LoginProps) => {
 	const [username, setUsername] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
+	const [errMsg, setErrMsg] = useState<string>("");
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -81,7 +83,12 @@ const LoginForm = ({ postData, handleJwt, setIsLogin }: LoginProps) => {
 			});
 			handleJwt(response.data.jwt, true);
 		} catch (error) {
-			console.log(error);
+			const e: AxiosError = error as AxiosError<ErrorResponse>;
+			console.error(e);
+			if (e.response && e.response.data) {
+				const data = e.response.data as ErrorResponse;
+				setErrMsg(data.message);
+			}
 		}
 	};
 
@@ -104,6 +111,8 @@ const LoginForm = ({ postData, handleJwt, setIsLogin }: LoginProps) => {
 			<button className="button" type="submit">
 				Submit
 			</button>
+			{errMsg && <p className="error">{errMsg}</p>}
+			<p className="error">{}</p>
 			<span className="changeForm">
 				No account?:{" "}
 				<button
@@ -142,10 +151,11 @@ const RegisterForm = ({ postData, setIsLogin }: RegisterProps) => {
 		e.preventDefault();
 
 		try {
-			const response = await postData<RegisterData>("register", null, {
+			await postData<RegisterData>("register", null, {
 				params: formData,
 			});
-			console.log(response);
+			window.alert("Registration successful!");
+			setIsLogin(true);
 		} catch (err) {
 			console.error(err);
 		}

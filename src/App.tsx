@@ -7,6 +7,11 @@ import Cart from "./Cart";
 import "./style/main.css";
 import { CartProvider } from "./CartContext";
 
+export interface ErrorResponse {
+	message: string;
+	status: number;
+}
+
 const App = () => {
 	const [jwtToken, setJwtToken] = useState<string | null>(
 		localStorage.getItem("jwtToken"),
