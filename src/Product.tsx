@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import "./style/product.css";
 import { useCart } from "./CartContext";
@@ -18,7 +18,7 @@ interface ProductProps {
 		data: D,
 		config?: AxiosRequestConfig,
 	) => Promise<AxiosResponse<T>>;
-	userId: number;
+	userId: number | undefined;
 }
 
 const Product = ({ fetchData, postData, userId }: ProductProps) => {
@@ -27,6 +27,7 @@ const Product = ({ fetchData, postData, userId }: ProductProps) => {
 	const numCart = 1;
 
 	const addToCart = async (id: number) => {
+		console.log(userId);
 		try {
 			const res = await postData<CartItem>("shoppingCart", {
 				numCart: numCart,
@@ -41,8 +42,15 @@ const Product = ({ fetchData, postData, userId }: ProductProps) => {
 					allCarts: [...prevState.allCarts, res.data],
 				};
 			});
-		} catch (e) {
-			console.error(e);
+		} catch (error) {
+			const e: AxiosError = error as AxiosError;
+			switch (e.response?.status) {
+				case 409:
+					window.alert("That product is already in the cart");
+					break;
+				default:
+					console.error(error);
+			}
 		}
 	};
 

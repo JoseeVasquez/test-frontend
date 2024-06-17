@@ -1,7 +1,6 @@
 .mainNav {
 	background-color: #b0b0b0;
 	width: 5rem;
-	margin-right: auto;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -41,6 +40,7 @@
 
 	/* color */
 	background-color: #b464ff;
+	opacity: 1;
 
 	/* animation */
 	transition:
@@ -81,6 +81,7 @@
 }
 
 .navItem {
+	max-width: fit-content;
 	font-size: 1.5rem;
 	display: inline-block;
 	padding-bottom: 2px;
@@ -114,4 +115,32 @@
 a {
 	text-decoration: none;
 	color: inherit;
+}
+
+.userIcon {
+	height: 3rem;
+	position: fixed;
+	bottom: 5%;
+	left: 0.9rem;
+	cursor: pointer;
+}
+
+.deleteUser {
+	position: fixed;
+	inset: 0;
+	animation: show ease-in-out 300ms;
+}
+
+@keyframes show {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.deleteUser::backdrop {
+	background: black;
+	opacity: 0.5;
 }

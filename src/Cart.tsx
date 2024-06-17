@@ -12,7 +12,7 @@ export interface CartItem {
 
 export interface CartData {
 	numCart: number;
-	userId: number;
+	userId: number | undefined;
 	allCarts: CartItem[];
 	totalPrices: number;
 }
@@ -38,7 +38,7 @@ interface CartProps {
 		path: string,
 		config?: AxiosRequestConfig,
 	) => Promise<AxiosResponse<T>>;
-	userId: number;
+	userId: number | undefined;
 }
 const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 	const { cart, setCart } = useCart();
@@ -48,37 +48,45 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 	const numCart = 1;
 
 	const handleCheckout = async () => {
-		try {
-			// create the invoice
-			const invoiceRes = await postData<InvoiceData>(
-				`invoice/${numCart}/user/${userId}`,
-			);
+		// create the invoice
+		const invoiceRes = await postData<InvoiceData>(
+			`invoice/${numCart}/user/${userId}`,
+		).catch((err: AxiosError) => {
+			switch (err.response?.status) {
+				case 400:
+					window.alert("Shopping cart is empty");
+					return;
+				default:
+					console.error(err);
+			}
+			return;
+		});
 
-			// retrieve the pdf blob
-			const invoice = invoiceRes.data;
-			const res = await fetchData<Blob>(`invoice/${invoice.id}`, {
-				responseType: "blob",
-			});
+		if (!invoiceRes) return;
 
-			// create blob from that
-			const blob = new Blob([res.data], { type: "application/json" });
+		// retrieve the pdf blob
+		const invoice = invoiceRes.data;
+		const res = await fetchData<Blob>(`invoice/${invoice.id}`, {
+			responseType: "blob",
+		});
 
-			// create link
-			const link = document.createElement("a");
-			link.href = window.URL.createObjectURL(blob);
-			link.download = "invoice.pdf";
+		// create blob from that
+		const blob = new Blob([res.data], { type: "application/json" });
+		const blobUrl = window.URL.createObjectURL(blob);
 
-			// clicks the link and then removes it
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
+		// create link
+		const link = document.createElement("a");
+		link.href = blobUrl;
+		link.download = "invoice.pdf";
 
-			window.location.reload();
+		// clicks the link and then removes it
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 
-			console.log(res.data);
-		} catch (error) {
-			console.error(error);
-		}
+		window.location.reload();
+
+		console.log(res.data);
 	};
 
 	const ref = useOutsideClick(() => {
@@ -102,118 +110,113 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 	};
 
 	const deleteProduct = async (id: number) => {
-		try {
-			const res = await deleteData<undefined>(
-				`shoppingCart/${numCart}/${userId}`,
-				{
-					params: {
-						productId: id,
-					},
+		const res = await deleteData<undefined>(
+			`shoppingCart/${numCart}/${userId}`,
+			{
+				params: {
+					productId: id,
 				},
+			},
+		).catch((err: AxiosError) => {
+			console.error(err);
+		});
+
+		setCart((prevCart: CartData | null) => {
+			if (!prevCart) return prevCart;
+
+			const updatedCarts = prevCart.allCarts.filter(
+				(cartItem) => cartItem.productId !== id,
 			);
 
-			setCart((prevCart: CartData | null) => {
-				if (!prevCart) return prevCart;
-
-				const updatedCarts = prevCart.allCarts.filter(
-					(cartItem) => cartItem.productId !== id,
-				);
-
-				return {
-					...prevCart,
-					allCarts: updatedCarts,
-				};
-			});
-			console.log(res);
-			return;
-		} catch (error) {
-			console.error(error);
-		}
+			return {
+				...prevCart,
+				allCarts: updatedCarts,
+			};
+		});
+		console.log(res);
+		return;
 	};
 
 	const updateAmount = async (id: number, increase: boolean) => {
 		console.log(id, increase);
-		try {
-			if (!increase) {
-				const currentItem = cart?.allCarts.find(
-					(item) => item.productId === id,
-				);
-
-				if (currentItem && currentItem.stockSell === 1) {
-					// If stockSell is 1 and we're decreasing, delete the item from the cart
-					deleteProduct(id);
-				}
-			}
-
-			// Call postData for both increasing and decreasing
-			const res = await postData<CartItem>(
-				`shoppingCart/${numCart}/${increase ? "increase" : "decrease"}/${userId}`,
-				null,
-				{
-					params: {
-						productId: id,
-						amount: 1,
-					},
-				},
+		if (!increase) {
+			const currentItem = cart?.allCarts.find(
+				(item) => item.productId === id,
 			);
-			console.log(res);
 
-			// Update the cart state
-			setCart((prevCart: CartData | null) => {
-				if (!prevCart) return prevCart;
-
-				const updatedCarts = prevCart.allCarts.map((cartItem) => {
-					if (cartItem.productId === id) {
-						return {
-							...cartItem,
-							stockSell: increase
-								? cartItem.stockSell + 1
-								: cartItem.stockSell - 1,
-						};
-					}
-					return cartItem;
-				});
-
-				return {
-					...prevCart,
-					allCarts: updatedCarts,
-				};
-			});
-		} catch (e) {
-			console.error(e);
+			if (currentItem && currentItem.stockSell === 1) {
+				// If stockSell is 1 and we're decreasing, delete the item from the cart
+				deleteProduct(id);
+			}
 		}
+
+		// Call postData for both increasing and decreasing
+		const res = await postData<CartItem>(
+			`shoppingCart/${numCart}/${increase ? "increase" : "decrease"}/${userId}`,
+			null,
+			{
+				params: {
+					productId: id,
+					amount: 1,
+				},
+			},
+		).catch((err: AxiosError) => {
+			console.error(err);
+		});
+		console.log(res);
+
+		// Update the cart state
+		setCart((prevCart: CartData | null) => {
+			if (!prevCart) return prevCart;
+
+			const updatedCarts = prevCart.allCarts.map((cartItem) => {
+				if (cartItem.productId === id) {
+					return {
+						...cartItem,
+						stockSell: increase
+							? cartItem.stockSell + 1
+							: cartItem.stockSell - 1,
+					};
+				}
+				return cartItem;
+			});
+
+			return {
+				...prevCart,
+				allCarts: updatedCarts,
+			};
+		});
 	};
 
 	const clearCart = async () => {
-		try {
-			await deleteData(`shoppingCart/${numCart}/clear/${userId}`);
-			setCart((prevCart) => ({
-				...prevCart!,
-				allCarts: [],
-			}));
-			setProducts([]);
-			setTotal(0);
-		} catch (e) {
-			throw e;
-		}
+		await deleteData(`shoppingCart/${numCart}/clear/${userId}`).catch(
+			(err: AxiosError) => {
+				throw err;
+			},
+		);
+		setCart((prevCart) => ({
+			...prevCart!,
+			allCarts: [],
+		}));
+		setProducts([]);
+		setTotal(0);
 	};
 
 	const getCartData = async () => {
-		try {
-			const response = await fetchData<CartData>(
-				`shoppingCart/${numCart}/${userId}`,
-			);
-			console.log(response.data);
-			setCart(response.data);
-		} catch (error) {
-			const e: AxiosError = error as AxiosError;
-			if (e.response && e.response.status === 404) {
+		const response = await fetchData<CartData>(
+			`shoppingCart/${numCart}/${userId}`,
+		).catch((err) => {
+			if (err.response && err.response.status === 404) {
 				// Handle the case where the cart is empty
 				setCart({ numCart, userId, allCarts: [], totalPrices: 0 });
 			} else {
-				console.error(error);
+				console.error(err);
 			}
-		}
+		});
+		if (!response) throw new AxiosError("Could not fetch data");
+
+		console.log(response.data);
+		setCart(response.data);
 	};
 
 	const fetchProductData = async () => {
@@ -277,7 +280,7 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 											deleteProduct(item.productId)
 										}
 									/>
-									<p>Price: {price}</p>
+									<p>Price: {price.toFixed(2)}</p>
 									<p>
 										Total price:{" "}
 										{(price * item.stockSell).toFixed(2)}

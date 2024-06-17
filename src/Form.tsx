@@ -4,14 +4,14 @@ import "./style/main.css";
 import "./style/form.css";
 import { ErrorResponse } from "./App";
 
-interface LoginResponse {
-	user: string;
+export interface LoginResponse {
+	id: number;
 	authorities: string[];
 	jwt: string;
 }
 
 interface FormProps {
-	handleJwt: (jwt: string, auth: boolean) => void;
+	handleJwt: (jwt: string, auth: boolean, userId: number) => void;
 	postData: <T, D = unknown>(
 		path: string,
 		data?: D,
@@ -25,7 +25,7 @@ interface LoginProps {
 		data?: D,
 		config?: AxiosRequestConfig,
 	) => Promise<AxiosResponse<T>>;
-	handleJwt: (jwt: string, auth: boolean) => void;
+	handleJwt: (jwt: string, auth: boolean, userId: number) => void;
 	setIsLogin: (state: boolean) => void;
 }
 
@@ -81,7 +81,8 @@ const LoginForm = ({ postData, handleJwt, setIsLogin }: LoginProps) => {
 					password: password,
 				},
 			});
-			handleJwt(response.data.jwt, true);
+			console.log(response.data);
+			handleJwt(response.data.jwt, true, response.data.id);
 		} catch (error) {
 			const e: AxiosError = error as AxiosError<ErrorResponse>;
 			console.error(e);
