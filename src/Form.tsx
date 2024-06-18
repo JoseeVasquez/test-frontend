@@ -29,7 +29,7 @@ interface LoginProps {
 	setIsLogin: (state: boolean) => void;
 }
 
-interface RegisterData {
+export interface UserData {
 	dniCif: string;
 	name: string;
 	email: string;
@@ -129,7 +129,7 @@ const LoginForm = ({ postData, handleJwt, setIsLogin }: LoginProps) => {
 };
 
 const RegisterForm = ({ postData, setIsLogin }: RegisterProps) => {
-	const [formData, setFormData] = useState<RegisterData>({
+	const [formData, setFormData] = useState<UserData>({
 		dniCif: "",
 		name: "",
 		email: "",
@@ -152,7 +152,7 @@ const RegisterForm = ({ postData, setIsLogin }: RegisterProps) => {
 		e.preventDefault();
 
 		try {
-			await postData<RegisterData>("register", null, {
+			await postData<UserData>("register", null, {
 				params: formData,
 			});
 			window.alert("Registration successful!");

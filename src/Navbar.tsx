@@ -10,11 +10,15 @@ interface NavbarProps {
 		path: string,
 		config?: AxiosRequestConfig,
 	) => Promise<AxiosResponse<String>>;
-	fetchData: (
+	fetchData: <T>(
 		path: string,
 		config?: AxiosRequestConfig,
-	) => Promise<AxiosResponse<[]>>;
+	) => Promise<AxiosResponse<T>>;
 	deleteData: <T>(
+		path: string,
+		config?: AxiosRequestConfig,
+	) => Promise<AxiosResponse<T>>;
+	putData: <T>(
 		path: string,
 		config?: AxiosRequestConfig,
 	) => Promise<AxiosResponse<T>>;
@@ -39,6 +43,28 @@ interface InvoiceHistoryProps {
 	userId: number | undefined;
 }
 
+interface UpdateUserProps {
+	putData: <T>(
+		path: string,
+		config?: AxiosRequestConfig,
+	) => Promise<AxiosResponse<T>>;
+	userId: number | undefined;
+}
+
+interface UserData {
+	id: number;
+	dni_cif?: string;
+	name?: string;
+	email?: string;
+	address?: string;
+	phone?: string;
+	password?: string;
+	currency?: string;
+	role?: Roles;
+	language?: string;
+}
+
+type Roles = "USER" | "WORKER" | "ADMIN";
 type NavDialogMode = "INVOICES" | "UPDATE" | "DELETE" | null;
 
 const Navbar = ({
@@ -46,12 +72,14 @@ const Navbar = ({
 	postData,
 	fetchData,
 	deleteData,
+	putData,
 	userId,
 }: NavbarProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isNav, setIsNav] = useState(true);
-	const [deleteUser, setDeleteUser] = useState(false);
+	const [dialogState, setDialogState] = useState(false);
 	const [dialogMode, setDialogMode] = useState<NavDialogMode>();
+	const [user, setUser] = useState<string>("");
 
 	const ref = useOutsideClick(() => {
 		setIsOpen(false);
@@ -74,12 +102,12 @@ const Navbar = ({
 		) as HTMLDialogElement;
 
 		if (dialogElement) {
-			if (deleteUser) {
-				setDeleteUser(false);
+			if (dialogState) {
+				setDialogState(false);
 				setDialogMode(null);
 				dialogElement.close();
 			} else {
-				setDeleteUser(true);
+				setDialogState(true);
 				setDialogMode(mode);
 				dialogElement.showModal();
 			}
@@ -91,6 +119,7 @@ const Navbar = ({
 			".dialog",
 		) as HTMLDialogElement;
 		setDialogMode(null);
+		setDialogState(false);
 		dialogElement.close();
 	};
 
@@ -107,6 +136,8 @@ const Navbar = ({
 						closeDialog={closeDialog}
 					/>
 				);
+			case "UPDATE":
+				return <UpdateUser putData={putData} userId={userId} />;
 			default:
 				return null;
 		}
@@ -130,6 +161,19 @@ const Navbar = ({
 			(t as HTMLDialogElement).close();
 		}
 	};
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			await fetchData<UserData>(`user/${userId}`)
+				.then((res: AxiosResponse<UserData>) => {
+					setUser(res.data.email as string);
+				})
+				.catch((err: AxiosError) => console.error(err));
+		};
+
+		fetchUser();
+        console.log(user);
+	}, []);
 
 	return (
 		<nav ref={ref} className={`mainNav ${isOpen ? "open" : ""}`}>
@@ -206,6 +250,7 @@ const Navbar = ({
 					<dialog className="dialog" onClick={dialogClickHandler}>
 						{dialogWindow()}
 					</dialog>
+					<p>User: {user}</p>
 				</div>
 			)}
 		</nav>
@@ -272,6 +317,72 @@ const InvoiceHistory = ({ userId, fetchData }: InvoiceHistoryProps) => {
 				</div>
 			))}
 		</div>
+	);
+};
+
+const UpdateUser = ({ putData, userId }: UpdateUserProps) => {
+	const [userData, setUserData] = useState<UserData>({
+		id: userId as number,
+	});
+
+	const handleFormData = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const data = new FormData(e.target as HTMLFormElement);
+
+		data.forEach((value, key) => {
+			setUserData((prevState) => ({
+				...prevState,
+				[key]: value as string,
+			}));
+		});
+
+		const config: AxiosRequestConfig = { data: { userData } };
+
+		console.log(userData);
+
+		await putData<UserData>("user", config)
+			.then((res) => {
+				console.log(res);
+				window.alert("User data updated sucessfully");
+			})
+			.catch((err: AxiosError) => console.error(err));
+	};
+
+	return (
+		<form onSubmit={handleFormData}>
+			<label htmlFor="dni_cif">DNI/CIF</label>
+			<input type="text" id="dni_cif" name="dni_cif" />
+
+			<label htmlFor="name">Name</label>
+			<input type="text" id="name" name="name" />
+
+			<label htmlFor="email">Email</label>
+			<input type="email" id="email" name="email" />
+
+			<label htmlFor="address">Address</label>
+			<input type="text" id="address" name="address" />
+
+			<label htmlFor="phone">Phone</label>
+			<input type="tel" id="phone" name="phone" />
+
+			<label htmlFor="password">Password</label>
+			<input type="password" id="password" name="password" />
+
+			<label htmlFor="currency">Currency</label>
+			<input type="text" id="currency" name="currency" />
+
+			<label htmlFor="role">Role</label>
+			<select id="role" name="role">
+				<option value="user">User</option>
+				<option value="admin">Admin</option>
+				<option value="worker">Worker</option>
+			</select>
+
+			<label htmlFor="language">Language</label>
+			<input type="text" id="language" name="language" />
+
+			<button type="submit">Submit</button>
+		</form>
 	);
 };
 

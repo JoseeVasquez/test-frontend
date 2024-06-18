@@ -12,60 +12,67 @@ export interface ProductResponse {
 }
 
 interface ProductProps {
-	fetchData: <T>(path: string) => Promise<AxiosResponse<T[]>>;
+	fetchData: <T>(
+		path: string,
+		config?: AxiosRequestConfig,
+	) => Promise<AxiosResponse<T[]>>;
 	postData: <T, D = unknown>(
 		path: string,
 		data: D,
 		config?: AxiosRequestConfig,
 	) => Promise<AxiosResponse<T>>;
 	userId: number | undefined;
+	arg: string | null;
 }
 
-const Product = ({ fetchData, postData, userId }: ProductProps) => {
+const Product = ({ fetchData, postData, userId, arg }: ProductProps) => {
 	const [products, setProducts] = useState<ProductResponse[]>();
 	const { setCart } = useCart();
 	const numCart = 1;
 
 	const addToCart = async (id: number) => {
 		console.log(userId);
-		try {
-			const res = await postData<CartItem>("shoppingCart", {
-				numCart: numCart,
-				userId: userId,
-				productId: id,
-				stockSell: 1,
+		await postData<CartItem>("shoppingCart", {
+			numCart: numCart,
+			userId: userId,
+			productId: id,
+			stockSell: 1,
+		})
+			.then((res) => {
+				setCart((prevState) => {
+					if (!prevState) return null;
+					return {
+						...prevState,
+						allCarts: [...prevState.allCarts, res.data],
+					};
+				});
+			})
+			.catch((err: AxiosError) => {
+				switch (err.response?.status) {
+					case 409:
+						window.alert("That product is already in the cart");
+						break;
+					default:
+						console.error(err);
+				}
 			});
-			setCart((prevState) => {
-				if (!prevState) return null;
-				return {
-					...prevState,
-					allCarts: [...prevState.allCarts, res.data],
-				};
-			});
-		} catch (error) {
-			const e: AxiosError = error as AxiosError;
-			switch (e.response?.status) {
-				case 409:
-					window.alert("That product is already in the cart");
-					break;
-				default:
-					console.error(error);
-			}
-		}
 	};
 
 	useEffect(() => {
 		const fetchProducts = async () => {
-			try {
-				const response = await fetchData<ProductResponse>("products");
-				setProducts(response.data);
-			} catch (err) {
-				console.error(err);
-			}
+			const config: AxiosRequestConfig = arg
+				? { params: { arg: arg } }
+				: {};
+			console.log(config);
+			await fetchData<ProductResponse>("products", config)
+				.then((res) => {
+					setProducts(res.data);
+				})
+				.catch((err: AxiosError) => console.error(err));
 		};
 
 		fetchProducts();
-	}, []);
+	}, [arg]);
 
 	return (
 		<div className="productContainer">

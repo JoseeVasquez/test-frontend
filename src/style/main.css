@@ -1,56 +1,55 @@
 :root {
-    --bg-color: lightgray;
-    --ff-main: system-ui;
+	--bg-color: lightgray;
+	--ff-main: system-ui;
 }
 
 body {
-    /* font and color */
-    background-color: var(--bg-color);
-    font-family: var(--ff-main);
-    
-    /* sizing and positioning*/
-    height: 100dvh;
+	/* font and color */
+	background-color: var(--bg-color);
+	font-family: var(--ff-main);
+
+	/* sizing and positioning*/
+	height: 100dvh;
 }
 
 #root {
-    /* sizing and positioning*/
-    height: 100dvh;
+	/* sizing and positioning*/
+	height: 100dvh;
 }
 
 .button {
-    /* font */
-    font-size: 1.3rem;
+	/* font */
+	font-size: 1.3rem;
 
-    /* border */
-    border: 1px solid black;
-    border-radius: 6px;
+	/* border */
+	border: 1px solid black;
+	border-radius: 6px;
 
-    /* positioning and sizing */
-    width: max-content;
-    padding-block: .5rem;
-    padding-inline: 1.25rem;
-    
-    /* animation */
-    transition: ease-in-out 100ms;
+	/* positioning and sizing */
+	width: max-content;
+	padding-block: 0.5rem;
+	padding-inline: 1.25rem;
+
+	/* animation */
+	transition: ease-in-out 100ms;
 }
 
 .button:hover {
-    transform: scale(1.05);
+	transform: scale(1.05);
 }
 
-
 input {
-    /* font */
-    font-size: 1.25rem;
+	/* font */
+	font-size: 1.25rem;
 
-    /* border */
-    border: 2px inset black;
-    border-radius: 6px;
+	/* border */
+	border: 2px inset black;
+	border-radius: 6px;
 
-    /* animation */
-    transition: ease-in-out 100ms;
+	/* animation */
+	transition: ease-in-out 100ms;
 }
 
 input:hover {
-    transform: scale(1.05);
+	transform: scale(1.05);
 }

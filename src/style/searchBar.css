@@ -1,0 +1,14 @@
+.searchBar {
+	position: absolute;
+	top: 2%;
+	right: 50%;
+	transform: translateX(50%);
+	text-align: center;
+	width: max-content;
+}
+
+.searchBar input {
+	padding: 0.5rem 1.25rem;
+	width: 50dvw;
+	font-size: 1.75rem;
+}
