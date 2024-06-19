@@ -85,8 +85,6 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 		document.body.removeChild(link);
 
 		window.location.reload();
-
-		console.log(res.data);
 	};
 
 	const ref = useOutsideClick(() => {
@@ -110,14 +108,11 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 	};
 
 	const deleteProduct = async (id: number) => {
-		const res = await deleteData<undefined>(
-			`shoppingCart/${numCart}/${userId}`,
-			{
-				params: {
-					productId: id,
-				},
+		await deleteData<undefined>(`shoppingCart/${numCart}/${userId}`, {
+			params: {
+				productId: id,
 			},
-		).catch((err: AxiosError) => {
+		}).catch((err: AxiosError) => {
 			console.error(err);
 		});
 
@@ -133,12 +128,10 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 				allCarts: updatedCarts,
 			};
 		});
-		console.log(res);
 		return;
 	};
 
 	const updateAmount = async (id: number, increase: boolean) => {
-		console.log(id, increase);
 		if (!increase) {
 			const currentItem = cart?.allCarts.find(
 				(item) => item.productId === id,
@@ -151,7 +144,7 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 		}
 
 		// Call postData for both increasing and decreasing
-		const res = await postData<CartItem>(
+		await postData<CartItem>(
 			`shoppingCart/${numCart}/${increase ? "increase" : "decrease"}/${userId}`,
 			null,
 			{
@@ -163,7 +156,6 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 		).catch((err: AxiosError) => {
 			console.error(err);
 		});
-		console.log(res);
 
 		// Update the cart state
 		setCart((prevCart: CartData | null) => {
@@ -215,7 +207,6 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 		});
 		if (!response) throw new AxiosError("Could not fetch data");
 
-		console.log(response.data);
 		setCart(response.data);
 	};
 
@@ -227,7 +218,6 @@ const Cart = ({ fetchData, postData, deleteData, userId }: CartProps) => {
 			try {
 				const responses = await Promise.all(productRequests);
 				const products = responses.map((response) => response.data);
-				console.log(products);
 				setProducts(products);
 			} catch (error) {
 				console.error(error);

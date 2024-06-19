@@ -23,15 +23,26 @@ interface ProductProps {
 	) => Promise<AxiosResponse<T>>;
 	userId: number | undefined;
 	arg: string | null;
+	category: string | null;
 }
 
-const Product = ({ fetchData, postData, userId, arg }: ProductProps) => {
+export interface CategoryData {
+	id: number;
+	name: string;
+}
+
+const Product = ({
+	fetchData,
+	postData,
+	userId,
+	arg,
+	category,
+}: ProductProps) => {
 	const [products, setProducts] = useState<ProductResponse[]>();
 	const { setCart } = useCart();
 	const numCart = 1;
 
 	const addToCart = async (id: number) => {
-		console.log(userId);
 		await postData<CartItem>("shoppingCart", {
 			numCart: numCart,
 			userId: userId,
@@ -60,37 +71,56 @@ const Product = ({ fetchData, postData, userId, arg }: ProductProps) => {
 
 	useEffect(() => {
 		const fetchProducts = async () => {
-			const config: AxiosRequestConfig = arg
-				? { params: { arg: arg } }
-				: {};
-			console.log(config);
-			await fetchData<ProductResponse>("products", config)
+			const path: string =
+				category && !arg ? "products/term" : "products";
+			let config: AxiosRequestConfig = {};
+			if (arg) {
+				config = { params: { arg: arg } };
+			} else if (!arg && category) {
+				config = { params: { category } };
+			} else {
+				config = {};
+			}
+			await fetchData<ProductResponse>(path, config)
 				.then((res) => {
 					setProducts(res.data);
 				})
-				.catch((err: AxiosError) => console.error(err));
+				.catch((err: AxiosError) => {
+					switch (err.response?.status) {
+						case 404:
+							setProducts([]);
+							break;
+						default:
+							console.error(err);
+							break;
+					}
+				});
 		};
 
 		fetchProducts();
-	}, [arg]);
+	}, [arg, category]);
 
 	return (
 		<div className="productContainer">
-			{products?.map((product) => {
-				return (
-					<article className="product" key={product.id}>
-						<h2>{product.name}</h2>
-						<p className="price">{product.price}</p>
-						<button
-							type="button"
-							className="button add"
-							onClick={() => addToCart(product.id)}
-						>
-							Add to cart
-						</button>
-					</article>
-				);
-			})}
+			{(products?.length as number) > 0 ? (
+				products?.map((product) => {
+					return (
+						<article className="product" key={product.id}>
+							<h2>{product.name}</h2>
+							<p className="price">{product.price}</p>
+							<button
+								type="button"
+								className="button add"
+								onClick={() => addToCart(product.id)}
+							>
+								Add to cart
+							</button>
+						</article>
+					);
+				})
+			) : (
+				<h2>No products found</h2>
+			)}
 		</div>
 	);
 };

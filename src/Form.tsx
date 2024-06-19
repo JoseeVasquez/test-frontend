@@ -71,26 +71,25 @@ const LoginForm = ({ postData, handleJwt, setIsLogin }: LoginProps) => {
 	const [username, setUsername] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [errMsg, setErrMsg] = useState<string>("");
+	const [res, setRes] = useState<AxiosResponse>();
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		try {
-			const response = await postData<LoginResponse>("login", null, {
-				params: {
-					email: username,
-					password: password,
-				},
+		await postData<LoginResponse>("login", null, {
+			params: {
+				email: username,
+				password: password,
+			},
+		})
+			.then((res) => setRes(res))
+			.catch((err: AxiosError) => {
+				console.error(err);
+				if (err.response && err.response.data) {
+					const data = err.response.data as ErrorResponse;
+					setErrMsg(data.message);
+				}
 			});
-			console.log(response.data);
-			handleJwt(response.data.jwt, true, response.data.id);
-		} catch (error) {
-			const e: AxiosError = error as AxiosError<ErrorResponse>;
-			console.error(e);
-			if (e.response && e.response.data) {
-				const data = e.response.data as ErrorResponse;
-				setErrMsg(data.message);
-			}
-		}
+		handleJwt(res?.data.jwt, res ? true : false, res?.data.id);
 	};
 
 	return (
@@ -151,15 +150,11 @@ const RegisterForm = ({ postData, setIsLogin }: RegisterProps) => {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		try {
-			await postData<UserData>("register", null, {
-				params: formData,
-			});
-			window.alert("Registration successful!");
-			setIsLogin(true);
-		} catch (err) {
-			console.error(err);
-		}
+		await postData<UserData>("register", null, {
+			params: formData,
+		}).catch((err: AxiosError) => console.error(err));
+		window.alert("Registration successful!");
+		setIsLogin(true);
 	};
 
 	return (

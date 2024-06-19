@@ -87,13 +87,8 @@ const Navbar = ({
 
 	const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-		try {
-			const response = postData("logout");
-			handleJwt("", false);
-			console.log((await response).data);
-		} catch (error) {
-			console.error(error);
-		}
+		await postData("logout").catch((err: AxiosError) => console.error(err));
+		handleJwt("", false);
 	};
 
 	const handleDialogClick = (mode: NavDialogMode) => {
@@ -166,14 +161,13 @@ const Navbar = ({
 		const fetchUser = async () => {
 			await fetchData<UserData>(`user/${userId}`)
 				.then((res: AxiosResponse<UserData>) => {
-					setUser(res.data.email as string);
+					setUser(res.data.name as string);
 				})
 				.catch((err: AxiosError) => console.error(err));
 		};
 
 		fetchUser();
-        console.log(user);
-	}, []);
+	}, [userId]);
 
 	return (
 		<nav ref={ref} className={`mainNav ${isOpen ? "open" : ""}`}>
@@ -246,11 +240,11 @@ const Navbar = ({
 						>
 							Delete account
 						</li>
+						<p className="navItem">User: {user}</p>
 					</ul>
 					<dialog className="dialog" onClick={dialogClickHandler}>
 						{dialogWindow()}
 					</dialog>
-					<p>User: {user}</p>
 				</div>
 			)}
 		</nav>
@@ -264,25 +258,26 @@ const DeleteUser = ({
 	userId,
 }: DeleteUserProps) => {
 	const handleDelete = async () => {
-		try {
-			await deleteData(`user/${userId}`);
-			handleJwt("", false);
-		} catch (error) {
-			const e: AxiosError = error as AxiosError;
-			console.error(e);
-		}
+		await deleteData(`user/${userId}`).catch((err: AxiosError) =>
+			console.error(err),
+		);
+		handleJwt("", false);
 	};
 
 	return (
 		<>
 			<h2>Are you sure you wish to delete your user?</h2>
-			<p>This action is irreversable</p>
-			<button type="button" className="accept" onClick={handleDelete}>
+			<p>This action is irreversible</p>
+			<button
+				type="button"
+				className="button accept"
+				onClick={handleDelete}
+			>
 				Yes
 			</button>
 			<button
 				type="button"
-				className="decline"
+				className="button decline"
 				onClick={() => closeDialog()}
 			>
 				No
@@ -306,16 +301,20 @@ const InvoiceHistory = ({ userId, fetchData }: InvoiceHistoryProps) => {
 
 	return (
 		<div>
-			{invoices?.map((invoice) => (
-				<div key={invoice.id}>
-					<h2>{invoice.id}</h2>
-					<p>
-						Date:{" "}
-						{new Date(invoice.invoiceDate).toLocaleDateString()}
-					</p>
-					<p>Total: ${invoice.totalPrice.toFixed(2)}</p>
-				</div>
-			))}
+			{invoices ? (
+				invoices.map((invoice) => (
+					<div key={invoice.id}>
+						<h2>{invoice.id}</h2>
+						<p>
+							Date:{" "}
+							{new Date(invoice.invoiceDate).toLocaleDateString()}
+						</p>
+						<p>Total: ${invoice.totalPrice.toFixed(2)}</p>
+					</div>
+				))
+			) : (
+				<h2>No data</h2>
+			)}
 		</div>
 	);
 };
@@ -338,50 +337,67 @@ const UpdateUser = ({ putData, userId }: UpdateUserProps) => {
 
 		const config: AxiosRequestConfig = { data: { userData } };
 
-		console.log(userData);
-
 		await putData<UserData>("user", config)
-			.then((res) => {
-				console.log(res);
+			.then(() => {
 				window.alert("User data updated sucessfully");
 			})
 			.catch((err: AxiosError) => console.error(err));
 	};
 
 	return (
-		<form onSubmit={handleFormData}>
-			<label htmlFor="dni_cif">DNI/CIF</label>
-			<input type="text" id="dni_cif" name="dni_cif" />
+		<form className="updateForm" onSubmit={handleFormData}>
+			<div className="formElement">
+				<label htmlFor="dni_cif">DNI/CIF</label>
+				<input type="text" id="dni_cif" name="dni_cif" />
+			</div>
 
-			<label htmlFor="name">Name</label>
-			<input type="text" id="name" name="name" />
+			<div className="formElement">
+				<label htmlFor="name">Name</label>
+				<input type="text" id="name" name="name" />
+			</div>
 
-			<label htmlFor="email">Email</label>
-			<input type="email" id="email" name="email" />
+			<div className="formElement">
+				<label htmlFor="email">Email</label>
+				<input type="email" id="email" name="email" />
+			</div>
 
-			<label htmlFor="address">Address</label>
-			<input type="text" id="address" name="address" />
+			<div className="formElement">
+				<label htmlFor="address">Address</label>
+				<input type="text" id="address" name="address" />
+			</div>
 
-			<label htmlFor="phone">Phone</label>
-			<input type="tel" id="phone" name="phone" />
+			<div className="formElement">
+				<label htmlFor="phone">Phone</label>
+				<input type="tel" id="phone" name="phone" />
+			</div>
 
-			<label htmlFor="password">Password</label>
-			<input type="password" id="password" name="password" />
+			<div className="formElement">
+				<label htmlFor="password">Password</label>
+				<input type="password" id="password" name="password" />
+			</div>
 
-			<label htmlFor="currency">Currency</label>
-			<input type="text" id="currency" name="currency" />
+			<div className="formElement">
+				<label htmlFor="currency">Currency</label>
+				<input type="text" id="currency" name="currency" />
+			</div>
 
-			<label htmlFor="role">Role</label>
-			<select id="role" name="role">
-				<option value="user">User</option>
-				<option value="admin">Admin</option>
-				<option value="worker">Worker</option>
-			</select>
+			<div className="formElement">
+				<label htmlFor="role">Role</label>
+				<select id="role" name="role">
+					<option value="user">User</option>
+					<option value="admin">Admin</option>
+					<option value="worker">Worker</option>
+				</select>
+			</div>
 
-			<label htmlFor="language">Language</label>
-			<input type="text" id="language" name="language" />
+			<div className="formElement">
+				<label htmlFor="language">Language</label>
+				<input type="text" id="language" name="language" />
+			</div>
 
-			<button type="submit">Submit</button>
+			<button className="button submit" type="submit">
+				Submit
+			</button>
 		</form>
 	);
 };

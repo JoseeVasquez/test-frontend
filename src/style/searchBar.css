@@ -12,3 +12,50 @@
 	width: 50dvw;
 	font-size: 1.75rem;
 }
+
+.categories {
+	display: flex;
+	flex-direction: column;
+
+	max-width: max-content;
+	margin-inline: auto;
+	margin-block: 2rem;
+
+	padding: 1rem;
+
+	background-color: white;
+}
+
+.categoryInput {
+	margin: 0.5rem 2rem;
+}
+
+.categoryInput label {
+	font-size: 1.5rem;
+	width: max-content;
+	cursor: pointer;
+	background-image: linear-gradient(#ccc 0 0, #000 0 100%);
+	background-position: 0 100%;
+	background-size: 0% 2px;
+	background-repeat: no-repeat;
+	transition:
+		background-size 0.3s,
+		background-position 0s 0.3s;
+}
+
+.categoryInput label:hover,
+.categoryInput label:target {
+	color: #757575;
+	cursor: pointer;
+	background-position: 90% 100%;
+	background-size: 100% 2px;
+}
+
+.categoryInput input {
+	display: none;
+}
+
+.categoriesBtn {
+	font-size: 1.5rem;
+	margin-left: 4rem;
+}

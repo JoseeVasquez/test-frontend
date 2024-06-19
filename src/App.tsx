@@ -33,6 +33,8 @@ const App = () => {
 	);
 	const [arg, setArg] = useState<string | null>(null);
 
+	const [category, setCategory] = useState<string | null>(null);
+
 	const baseUrl: string = "http://localhost:8080/";
 
 	const handleJwt = (jwt: string, auth: boolean, userId?: number) => {
@@ -59,51 +61,48 @@ const App = () => {
 		data?: D,
 		config?: AxiosRequestConfig,
 	): Promise<AxiosResponse<T>> => {
-		const response = await axios
+		return await axios
 			.post<T>(`${baseUrl}${path}`, data, config)
+			.then((res) => res)
 			.catch((err: AxiosError) => {
-				console.error(err);
 				throw err;
 			});
-		return response;
 	};
 
 	const fetchData = async <T,>(
 		path: string,
 		config?: AxiosRequestConfig,
 	): Promise<AxiosResponse<T>> => {
-		const response = await axios
+		return await axios
 			.get<T>(`${baseUrl}${path}`, config)
+			.then((res) => res)
 			.catch((err: AxiosError) => {
-				console.error(err);
 				throw err;
 			});
-		return response;
 	};
 
 	const deleteData = async <T,>(
 		path: string,
 		config?: AxiosRequestConfig,
 	): Promise<AxiosResponse<T>> => {
-		const response = await axios
+		return await axios
 			.delete<T>(`${baseUrl}${path}`, config)
+			.then((res) => res)
 			.catch((err: AxiosError) => {
-				console.error(err);
 				throw err;
 			});
-		return response;
 	};
 
 	const putData = async <T,>(
 		path: string,
 		config?: AxiosRequestConfig,
 	): Promise<AxiosResponse<T>> => {
-		const res = await axios
+		return await axios
 			.put(`${baseUrl}${path}`, config)
+			.then((res) => res)
 			.catch((err: AxiosError) => {
 				throw err;
 			});
-		return res;
 	};
 
 	useEffect(() => {
@@ -111,7 +110,7 @@ const App = () => {
 		if (!parsedToken || parsedToken.exp * 1000 < Date.now()) {
 			localStorage.setItem("jwtToken", "");
 			setIsAuthenticated(false);
-            setJwtToken(null);
+			setJwtToken(null);
 		}
 	}, []);
 
@@ -135,13 +134,14 @@ const App = () => {
 						<SearchBar
 							fetchData={fetchData}
 							setArg={setArg}
-							arg={arg}
+							setCategory={setCategory}
 						/>
 						<Product
 							fetchData={fetchData}
 							postData={postData}
 							userId={userId ? userId : undefined}
 							arg={arg}
+							category={category}
 						/>
 						<Cart
 							fetchData={fetchData}
