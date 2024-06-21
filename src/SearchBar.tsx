@@ -1,6 +1,6 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import "./style/searchBar.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CategoryData } from "./Product";
 
 interface SearchBarProps {
@@ -14,6 +14,7 @@ interface SearchBarProps {
 
 const SearchBar = ({ fetchData, setArg, setCategory }: SearchBarProps) => {
 	const [categories, setCategories] = useState<CategoryData[] | null>(null);
+	const categoriesRef = useRef<HTMLFieldSetElement>(null);
 
 	const fetchCategories = async () => {
 		await fetchData<CategoryData[]>("categories")
@@ -56,7 +57,7 @@ const SearchBar = ({ fetchData, setArg, setCategory }: SearchBarProps) => {
 				See Categories
 			</button>
 			{categories && (
-				<fieldset className="categories">
+				<fieldset ref={categoriesRef} className="categories">
 					{categories?.map((category) => (
 						<div className="categoryInput">
 							<label htmlFor={category.id.toString()}>
